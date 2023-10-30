@@ -1,17 +1,17 @@
 import styles from './styles.module.scss';
 
-import ProfilePic from '../../assets/profile-pic.jpg';
+import ProfilePic from '../../assets/profile-pic.jpeg';
 
 export const MyPunch = () => {
     return (
         <div className={styles.myPunch}>
             <h2>Meu Ponto</h2>
             <main>
-                <img src={ProfilePic} alt="Its me bro" />
+                <img src={ProfilePic} alt="Profile Picture" />
                 <section className={styles.info}>
                     <div>
-                        <h3>Yuri Lopes Machado</h3>
-                        <p>Desenvolvedor Front-end</p>
+                        <h3>Ryan Gomes</h3>
+                        <p>Administração</p>
                     </div>
                     <div>
                         <h3>Cadastro</h3>
