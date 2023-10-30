@@ -1,4 +1,4 @@
-import './styles.scss';	
+import styles from './styles.module.scss';	
 
 interface LogoProps {
     size?: 'small' | 'medium' | 'large'
@@ -14,7 +14,10 @@ export const Logo = ({
     }
 
     return (
-        <h2 style={{ fontSize: remSize[size]}}>
+        <h2 
+            className={styles.logo} 
+            style={{ fontSize: remSize[size]}}
+        >
             Ze<span>kron</span>
         </h2>
     )

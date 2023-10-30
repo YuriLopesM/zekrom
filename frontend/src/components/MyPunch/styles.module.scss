@@ -1,0 +1,50 @@
+.myPunch {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    flex-grow: 1;
+
+    h2 {
+        font-size: 1rem;
+    }
+
+    main {
+        display: flex;
+        gap: 1.5rem;
+    
+        img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+        }
+    
+        .info {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+    
+            div {
+                display: flex;
+                flex-direction: column;
+                gap: 0.25rem;
+
+                h3 {
+                    font-size: 0.85rem;
+                    text-transform: uppercase;
+                    font-weight: 600;
+                    color: var(--gray-400);
+                }
+    
+                &:first-of-type h3 {
+                    color: var(--aqua)
+                }
+
+                p {
+                    font-size: 0.85rem;
+                    font-weight: 500;
+                }
+            }
+        }
+    }
+}
