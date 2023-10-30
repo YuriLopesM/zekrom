@@ -1,0 +1,17 @@
+button {
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 0.5rem;
+    outline: none;
+
+    background-color: var(--coral);
+    color: var(--white);
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+
+    &:hover {
+        background-color: var(--darker-coral);
+    }
+}

@@ -1,0 +1,41 @@
+:root {
+  --aqua: #61C0BF;
+  --blue-gray: #D5E5E9;
+  --coral: #FF7F50;
+  --black: #333333;
+  --white: #F2F2F2;
+  --gray-500: #666666;
+  --gray-400: #999999;
+  --gray-300: #BBBBBB;
+  --gray-200: #CCCCCC;
+  --gray-100: #E5E5E5;
+  --darker-coral: #FF6347;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+h1,
+h2, 
+h3,
+h4,
+h5,
+h6 {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background-color: var(--white);
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+}
