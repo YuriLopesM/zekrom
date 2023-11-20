@@ -1,0 +1,32 @@
+.tableContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+
+    section {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        gap: 1px;
+    }
+}
+
+.tableHeader {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 2fr repeat(2, 1.5fr) 1fr;
+    grid-template-rows: 1fr;
+    grid-column-gap: 0px;
+    grid-row-gap: 0px;
+    width: 100%;
+    padding: 0.5rem 1rem;
+
+    p {
+        font-weight: 600;
+        font-size: 12px;
+        color: var(--gray-500);
+    }
+}

@@ -1,0 +1,31 @@
+.tabContainer {
+    color: var(--gray-400);
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+
+    p {
+        font-size: 0.85rem;
+        font-weight: 500;
+        margin-bottom: 0;
+    }
+
+    &:hover {
+        background-color: var(--gray-200);
+        color: var(--gray-500)
+    }
+}
+
+.active {
+    color: var(--black);
+
+    p {
+        font-weight: 700;
+    }
+
+    &:hover {
+        background-color: var(--gray-200);
+        color: var(--black)
+    }
+}

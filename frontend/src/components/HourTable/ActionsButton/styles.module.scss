@@ -1,0 +1,17 @@
+.buttonContainer {
+    padding: 0.5rem 1rem;
+    color: var(--aqua);
+    background: var(--blue-gray);
+    border-radius: 1rem;
+    outline: 0;
+    border: 0;
+
+    font-weight: 600;
+
+    &:hover {
+        cursor: pointer;
+        background: var(--aqua);
+        color: var(--white);
+    }
+
+}

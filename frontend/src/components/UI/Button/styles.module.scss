@@ -6,12 +6,31 @@
     border-radius: 0.5rem;
     outline: none;
 
-    background-color: var(--coral);
-    color: var(--white);
     transition: all 0.2s ease-in-out;
     cursor: pointer;
+
+}
+
+.primary {
+    background-color: var(--coral);
+    color: var(--white);
 
     &:hover {
         background-color: var(--darker-coral);
     }
+}
+
+.ghost {
+    background-color: transparent;
+    color: inherit;
+
+    &:hover {
+        background-color: var(--gray-200);
+    }
+}
+
+.onlyIcon {
+    font-size: 0;
+    padding: 0.5rem;
+    border-radius: 50%;
 }

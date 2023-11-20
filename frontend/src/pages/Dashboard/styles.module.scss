@@ -4,4 +4,19 @@
         align-items: flex-start;
         gap: 4rem;
     }
+
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.bigNumberContainer {
+    display: flex;
+    gap: 2rem;
 }
