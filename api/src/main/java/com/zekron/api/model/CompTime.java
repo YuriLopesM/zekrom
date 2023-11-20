@@ -1,20 +1,18 @@
 package com.zekron.api.model;
 
-import java.time.LocalDate;
+import javax.persistence.*;
 
+@Entity
 public class CompTime extends BaseEntity {
-    private Long userId;
+    @Column(name = "month", nullable = false)
     private Integer month;
+    @Column(name = "year", nullable = false)
     private Integer year;
+    @Column(name = "hours", nullable = false)
     private Integer hours;
-
-    public long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(long userId) {
-        this.userId = userId;
-    }
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     public Integer getMonth() {
         return month;
@@ -40,13 +38,21 @@ public class CompTime extends BaseEntity {
         this.hours = hours;
     }
 
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
     @Override
     public String toString() {
         return "CompTime{" +
-                ", userId=" + userId +
-                ", month=" + month +
+                "month=" + month +
                 ", year=" + year +
                 ", hours=" + hours +
+                ", user=" + user +
                 '}';
     }
 }

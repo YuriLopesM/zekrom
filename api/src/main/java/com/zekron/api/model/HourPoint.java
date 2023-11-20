@@ -1,22 +1,23 @@
 package com.zekron.api.model;
 
+import javax.persistence.*;
 import java.sql.Time;
 import java.time.LocalDate;
 
+@Entity
 public class HourPoint extends BaseEntity {
-    private Long userId;
+    @Column(name = "date", nullable = false)
     private LocalDate date;
+    @Column(name = "hour", nullable = false)
     private Time hour;
+    @Column(name = "year", nullable = false)
     private Integer year;
-    private String status;
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private Status status;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     public LocalDate getDate() {
         return date;
@@ -42,22 +43,30 @@ public class HourPoint extends BaseEntity {
         this.year = year;
     }
 
-    public String getStatus() {
+    public Status getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     @Override
     public String toString() {
         return "HourPoint{" +
-                "userId=" + userId +
-                ", date=" + date +
+                "date=" + date +
                 ", hour=" + hour +
                 ", year=" + year +
-                ", status='" + status + '\'' +
+                ", status=" + status +
+                ", user=" + user +
                 '}';
     }
 }

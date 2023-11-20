@@ -1,16 +1,15 @@
 package com.zekron.api.model;
 
+import javax.persistence.*;
+
+@Entity
 public class Sector extends BaseEntity {
-    private Long scaleId;
+    @Column(name = "name", length = 50, nullable = false)
     private String name;
 
-    public Long getScaleId() {
-        return scaleId;
-    }
-
-    public void setScaleId(Long scaleId) {
-        this.scaleId = scaleId;
-    }
+    @ManyToOne
+    @JoinColumn(name = "scale_id")
+    private Scale scale;
 
     public String getName() {
         return name;
@@ -20,11 +19,19 @@ public class Sector extends BaseEntity {
         this.name = name;
     }
 
+    public Scale getScale() {
+        return scale;
+    }
+
+    public void setScale(Scale scale) {
+        this.scale = scale;
+    }
+
     @Override
     public String toString() {
         return "Sector{" +
-                "scaleId=" + scaleId +
-                ", name='" + name + '\'' +
+                "name='" + name + '\'' +
+                ", scale=" + scale +
                 '}';
     }
 }

@@ -1,10 +1,15 @@
 package com.zekron.api.model;
 
+import javax.persistence.*;
 import java.sql.Time;
 
-public class Turn extends BaseEntity {
+@Entity
+public class Turn extends BaseEntity  {
+    @Column(name = "hour_start", nullable = false)
     private Time hourStart;
+    @Column(name = "hour_end", nullable = false)
     private Time hourEnd;
+    @Column(name = "has_lunch", nullable = false)
     private Boolean hasLunch;
 
     public Time getHourStart() {

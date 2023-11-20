@@ -1,14 +1,25 @@
 package com.zekron.api.model;
 
+import javax.persistence.*;
 import java.time.LocalDate;
 
+@Entity
 public class GlobalConfig {
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @Column(name = "id", nullable = false)
     private Long id;
+    @Column(name = "minutes_to_extra_hour", nullable = false)
     private Integer minutesToExtraHour;
+    @Column(name = "days_to_expiration", nullable = false)
     private Integer daysToExpiration;
+    @Column(name = "working_saturday", nullable = false)
     private Boolean workingSaturday;
+    @Column(name = "working_sunday", nullable = false)
     private Boolean workingSunday;
+    @Column(name = "created_at", nullable = false)
     private LocalDate createdAt;
+    @Column(name = "updated_at", nullable = false)
     private LocalDate updatedAt;
 
     public Long getId() {
@@ -68,7 +79,7 @@ public class GlobalConfig {
     }
 
     @Override
-    public String toString() {
+    public String  toString() {
         return "GlobalConfig{" +
                 "id=" + id +
                 ", minutesToExtraHour=" + minutesToExtraHour +

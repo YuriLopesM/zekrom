@@ -1,25 +1,19 @@
 package com.zekron.api.model;
 
+import javax.persistence.*;
+
+@Entity
 public class Scale extends BaseEntity {
-    private Long generalTurnId;
-    private Long lunchTurnId;
+    @Column(name = "is_default", nullable = false)
     private Boolean isDefault;
 
-    public Long getGeneralTurnId() {
-        return generalTurnId;
-    }
+    @ManyToOne
+    @JoinColumn(name = "lunch_turn_id")
+    private Turn lunchTurn;
 
-    public void setGeneralTurnId(Long generalTurnId) {
-        this.generalTurnId = generalTurnId;
-    }
-
-    public Long getLunchTurnId() {
-        return lunchTurnId;
-    }
-
-    public void setLunchTurnId(Long lunchTurnId) {
-        this.lunchTurnId = lunchTurnId;
-    }
+    @ManyToOne
+    @JoinColumn(name = "general_turn_id")
+    private Turn generalTurn;
 
     public Boolean getDefault() {
         return isDefault;
@@ -29,12 +23,28 @@ public class Scale extends BaseEntity {
         isDefault = aDefault;
     }
 
+    public Turn getLunchTurn() {
+        return lunchTurn;
+    }
+
+    public void setLunchTurn(Turn lunchTurn) {
+        this.lunchTurn = lunchTurn;
+    }
+
+    public Turn getGeneralTurn() {
+        return generalTurn;
+    }
+
+    public void setGeneralTurn(Turn generalTurn) {
+        this.generalTurn = generalTurn;
+    }
+
     @Override
     public String toString() {
         return "Scale{" +
-                "generalTurnId=" + generalTurnId +
-                ", lunchTurnId=" + lunchTurnId +
-                ", isDefault=" + isDefault +
+                "isDefault=" + isDefault +
+                ", lunchTurn=" + lunchTurn +
+                ", generalTurn=" + generalTurn +
                 '}';
     }
 }

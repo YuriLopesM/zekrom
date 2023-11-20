@@ -1,11 +1,19 @@
 package com.zekron.api.model;
 
+import javax.persistence.*;
 import java.time.LocalDate;
 
+@MappedSuperclass
 public class BaseEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @Column(name = "id", nullable = false)
     private Long id;
+    @Column(name = "created_at", nullable = false)
     private LocalDate createdAt;
+    @Column(name = "updated_at", nullable = false)
     private LocalDate updatedAt;
+    @Column(name = "deleted_at", nullable = true)
     private LocalDate deletedAt;
 
     public Long getId() {

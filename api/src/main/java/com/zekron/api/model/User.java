@@ -1,36 +1,30 @@
 package com.zekron.api.model;
 
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+@Table(name="users")
 public class User extends BaseEntity {
-    private Long sectorId;
-    private Long officeId;
-    private Long scaleId;
+    @Column(name = "document", length = 20, nullable = false)
     private String document;
+    @Column(name = "name", length = 50, nullable = false)
     private String name;
+    @Column(name = "is_admin", nullable = false)
     private Boolean isAdmin;
 
-    public Long getSectorId() {
-        return sectorId;
-    }
+    @ManyToOne
+    @JoinColumn(name = "sector_id")
+    private Sector sector;
 
-    public void setSectorId(Long sectorId) {
-        this.sectorId = sectorId;
-    }
+    @ManyToOne
+    @JoinColumn(name = "office_id")
+    private Office office;
 
-    public Long getOfficeId() {
-        return officeId;
-    }
-
-    public void setOfficeId(Long officeId) {
-        this.officeId = officeId;
-    }
-
-    public Long getScaleId() {
-        return scaleId;
-    }
-
-    public void setScaleId(Long scaleId) {
-        this.scaleId = scaleId;
-    }
+    @ManyToOne
+    @JoinColumn(name = "scale_id")
+    private Scale scale;
 
     public String getDocument() {
         return document;
@@ -56,15 +50,39 @@ public class User extends BaseEntity {
         isAdmin = admin;
     }
 
+    public Sector getSector() {
+        return sector;
+    }
+
+    public void setSector(Sector sector) {
+        this.sector = sector;
+    }
+
+    public Office getOffice() {
+        return office;
+    }
+
+    public void setOffice(Office office) {
+        this.office = office;
+    }
+
+    public Scale getScale() {
+        return scale;
+    }
+
+    public void setScale(Scale scale) {
+        this.scale = scale;
+    }
+
     @Override
     public String toString() {
         return "User{" +
-                "sectorId=" + sectorId +
-                ", officeId=" + officeId +
-                ", scaleId=" + scaleId +
-                ", document='" + document + '\'' +
+                "document='" + document + '\'' +
                 ", name='" + name + '\'' +
                 ", isAdmin=" + isAdmin +
+                ", sector=" + sector +
+                ", office=" + office +
+                ", scale=" + scale +
                 '}';
     }
 }

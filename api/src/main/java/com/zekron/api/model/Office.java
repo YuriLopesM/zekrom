@@ -1,8 +1,14 @@
 package com.zekron.api.model;
 
+import javax.persistence.*;
+
+@Entity
 public class Office extends BaseEntity {
+    @Column(name = "name", length = 50, nullable = false)
     private String name;
+    @Column(name = "city", length = 80, nullable = false)
     private String city;
+    @Column(name = "state", length = 2, nullable = false)
     private String state;
 
     public String getName() {

@@ -1,31 +1,28 @@
 package com.zekron.api.model;
 
+import javax.persistence.*;
 import java.time.LocalDate;
 
+@Entity
 public class Absence extends BaseEntity{
-    private Long typeId;
-    private Long userId;
+    @Column(name = "justification", length = 512, nullable = false)
     private String justification;
+    @Column(name = "date_start", nullable = false)
     private LocalDate dateStart;
+    @Column(name = "date_end", nullable = true)
     private LocalDate dateEnd;
+    @Column(name = "hour_start", nullable = true)
     private LocalDate hourStart;
+    @Column(name = "hour_end", nullable = true)
     private LocalDate hourEnd;
 
-    public Long getTypeId() {
-        return typeId;
-    }
+    @ManyToOne
+    @JoinColumn(name = "type_id")
+    private AbsenceType type;
 
-    public void setTypeId(Long typeId) {
-        this.typeId = typeId;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     public String getJustification() {
         return justification;
@@ -67,16 +64,33 @@ public class Absence extends BaseEntity{
         this.hourEnd = hourEnd;
     }
 
+    public AbsenceType getType() {
+        return type;
+    }
+
+    public void setType(AbsenceType type) {
+        this.type = type;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+
     @Override
     public String toString() {
         return "Absence{" +
-                "typeId=" + typeId +
-                ", userId=" + userId +
-                ", justification='" + justification + '\'' +
+                "justification='" + justification + '\'' +
                 ", dateStart=" + dateStart +
                 ", dateEnd=" + dateEnd +
                 ", hourStart=" + hourStart +
                 ", hourEnd=" + hourEnd +
+                ", type=" + type +
+                ", user=" + user +
                 '}';
     }
 }
