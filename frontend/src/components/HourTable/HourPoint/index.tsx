@@ -2,6 +2,7 @@ import { ActionsButton } from "../ActionsButton";
 import { HourNote } from "../HourNote";
 import { SituationText, ISituation } from "../SituationText";
 import { IWarning, WarningTag } from "../WarningTag";
+
 import styles from "./styles.module.scss"
 
 export interface HourPointProps {
@@ -51,6 +52,7 @@ export const HourPoint = ({
                                 hour={situation.hour}
                                 description={situation.description}
                                 status={situation.status}
+                                key={situation.hour}
                             />
                         )
                     })
@@ -59,7 +61,11 @@ export const HourPoint = ({
             <div>
                 {
                     warnings?.map(warning => {
-                        return <WarningTag description={warning.description} type={warning.type} />
+                        return <WarningTag 
+                                    type={warning.type} 
+                                    description={warning.description} 
+                                    key={warning.description}
+                                />
                     })
                 }
             </div>

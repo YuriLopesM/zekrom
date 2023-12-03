@@ -6,10 +6,12 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement>{
 }
 
 export const Button = ({ 
+    ghost,
+    onlyIcon,
     ...props
 }: ButtonProps) => {
-    const isGhost = props.ghost ? styles.ghost : styles.primary;
-    const isOnlyIcon = props.onlyIcon ? styles.onlyIcon : '';
+    const isGhost = ghost ? styles.ghost : styles.primary;
+    const isOnlyIcon = onlyIcon ? styles.onlyIcon : '';
 
     return (
         <button 
