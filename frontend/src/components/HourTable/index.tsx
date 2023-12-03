@@ -28,6 +28,7 @@ export const HourTable = ({
                                 annotation={hourPoint.annotation}
                                 situations={hourPoint.situations}
                                 warnings={hourPoint.warnings}
+                                key={hourPoint.date.toString()}
                             />
                         )
                     })

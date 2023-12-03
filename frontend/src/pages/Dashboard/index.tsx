@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { BigNumber, HourTable, MonthSelector, MyPunch, TabPane } from "../../components"
+import { BigNumber, HourTable, MonthSelector, MyPunch } from "../../components"
+import { TabPane } from "../../components/UI";
 import { HourPointProps } from "../../components/HourTable/HourPoint";
 import { WarningType } from "../../components/HourTable/WarningTag";
 
@@ -78,7 +79,7 @@ export const Dashboard = () => {
                 <MonthSelector />
             </section>
             <main className={styles.content}>
-                <TabPane 
+                <TabPane
                     tabs={[
                         {
                             label: 'Esquema de Dias',

@@ -1,4 +1,3 @@
-export * from './UI';
 export * from './BigNumber';
 export * from './HourTable';
 export * from './MainHeader';
