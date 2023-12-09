@@ -20,14 +20,6 @@ export const MonthSelector = () => {
             .slice(0, 3);
     const year = date.getFullYear();
 
-    const handleAddMonth = () => {
-        setDate(new Date(date.setMonth(date.getMonth() + 1)));
-    }
-
-    const handleSubtractMonth = () => {
-        setDate(new Date(date.setMonth(date.getMonth() - 1)));
-    }
-
     const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
     const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
 
@@ -40,6 +32,14 @@ export const MonthSelector = () => {
         day: 'numeric',
         month: 'numeric'
     });
+
+    const handleAddMonth = () => {
+        setDate(new Date(date.setMonth(date.getMonth() + 1)));
+    }
+
+    const handleSubtractMonth = () => {
+        setDate(new Date(date.setMonth(date.getMonth() - 1)));
+    }
 
     return (
         <div className={styles.container}>
