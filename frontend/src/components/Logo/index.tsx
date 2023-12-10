@@ -1,11 +1,13 @@
 import styles from './styles.module.scss';	
 
 interface LogoProps {
-    size?: 'small' | 'medium' | 'large'
+    size?: 'small' | 'medium' | 'large',
+    type?: 'text' | 'logo'
 }
 
 export const Logo = ({
-    size = 'medium'
+    size = 'medium',
+    type = 'text'
 }: LogoProps) => {
     const remSize = {
         small: '1.5rem',
@@ -14,11 +16,23 @@ export const Logo = ({
     }
 
     return (
-        <h2 
-            className={styles.logo} 
-            style={{ fontSize: remSize[size]}}
-        >
-            Ze<span>kron</span>
-        </h2>
+        {
+            text: (
+                <h1
+                    className={styles.textLogo}
+                    style={{ fontSize: remSize[size] }}
+                >
+                    <span>Ze</span>kron
+                </h1>
+            ),
+            logo: (
+                <h1
+                    className={styles.logo}
+                    style={{ fontSize: remSize[size] }}
+                >
+                    Z<span>.</span>
+                </h1>
+            )
+        }[type] || <></>
     )
 }

@@ -1,3 +1,4 @@
+import { Logo } from '..';
 import { useAuth } from '../../context/AuthContext';
 import { SignOut } from '../Icons';
 
@@ -8,6 +9,7 @@ export const MainHeader = () => {
 
     return (
         <header className={styles.header}>
+            <Logo type="logo"/>
             <div className={styles.userInfo}>
                 <section 
                     className={styles.initialSection}

@@ -1,9 +1,21 @@
-.logo {
-    color: var(--aqua);
+.textLogo, .logo {
     font-weight: 800;
     text-align: center;
     display: inline-block;
     letter-spacing: -0.06rem;
+}
+
+.textLogo {
+    color: var(--aqua);
+
+    span {
+        color: var(--coral);
+    }
+
+}
+
+.logo {
+    color: var(--white);
 
     span {
         color: var(--coral);

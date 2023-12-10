@@ -1,0 +1,21 @@
+.item {
+
+    a svg {
+        width: 24px;
+        height: 24px;
+        stroke: var(--gray-200);
+
+        transition: stroke 0.2s ease-in-out;
+
+    }
+
+    a:not(.isActive) svg:hover  {
+        stroke: var(--gray-400);
+    }
+
+    .isActive svg {
+        stroke: var(--aqua);
+
+    }
+}
+

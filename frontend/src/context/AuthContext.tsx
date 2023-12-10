@@ -24,6 +24,7 @@ interface User {
   name: string;
   code: string;
   token: string;
+  role: 'admin' | 'user';
 }
 
 export const AuthContext = createContext({} as AuthContextData);
@@ -42,10 +43,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     try {
       // const { data: userData } = await api.post<UserCredentials, { data: User }>("/login", data);
-      const userData = {
+      const userData: User = {
         name: 'Yuri Lopes Machado',
         code: data.code,
-        token: 'fake-token'
+        token: 'fake-token',
+        role: 'admin'
       }
       setUser(userData);
       navigate("/dashboard");
@@ -63,5 +65,5 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 };
 
 export const useAuth = () => {
-    return useContext(AuthContext);
+  return useContext(AuthContext);
 };

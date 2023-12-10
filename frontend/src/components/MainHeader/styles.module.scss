@@ -3,13 +3,16 @@
     height: 56px;
     background-color: var(--aqua);
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: center;
+    padding-left: 5%;
 }
 
 .userInfo {
     min-width: 200px;
     position: relative;
     overflow: hidden;
+    height: 100%;
 
     &:hover {
         cursor: pointer;

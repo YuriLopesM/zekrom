@@ -7,7 +7,12 @@ import {
 } from "react-router-dom";
 
 import { Dashboard, Login } from "../pages";
-import { AuthLayout, OpenLayout, ProtectedLayout } from "../components/Auth";
+import { 
+    AuthLayout,
+    OpenLayout,
+    ProtectedLayout,
+    ProtectedRoute
+} from "../components/Auth";
 
 const router = createBrowserRouter(
     createRoutesFromElements(
@@ -20,12 +25,19 @@ const router = createBrowserRouter(
                 />
             </Route>
             <Route path='/' element={<ProtectedLayout />}>
-                <Route
-                    path="/dashboard"
-                    element={<Dashboard />}
-                />
+                <Route element={<ProtectedRoute roles={['admin', 'user']} />}>
+                    <Route
+                        path="/dashboard"
+                        element={<Dashboard />}
+                    />
+                </Route>
+                <Route element={<ProtectedRoute roles={['admin']} />}>
+                    <Route
+                        path="/hello"
+                        element={<h1>somente admins cria</h1>}
+                    />
+                </Route>
             </Route>
-
         </Route>
     )
 );
