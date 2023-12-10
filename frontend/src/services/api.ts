@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const token = localStorage.getItem('token:zekron')
+const token = JSON.parse(localStorage.getItem('user:zekron') || '{}').token
 
 export const api = axios.create({
     baseURL: import.meta.env.API_BASE_URL,
