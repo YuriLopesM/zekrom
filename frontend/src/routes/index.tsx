@@ -6,8 +6,14 @@ import {
     RouterProvider
 } from "react-router-dom";
 
-import { Dashboard, Login } from "../pages";
-import { 
+import {
+    Dashboard,
+    GlobalSettings,
+    Login,
+    MonthlyReport,
+    UserManagment
+} from "../pages";
+import {
     AuthLayout,
     OpenLayout,
     ProtectedLayout,
@@ -33,8 +39,16 @@ const router = createBrowserRouter(
                 </Route>
                 <Route element={<ProtectedRoute roles={['admin']} />}>
                     <Route
-                        path="/hello"
-                        element={<h1>somente admins cria</h1>}
+                        path="/user-managment"
+                        element={<UserManagment />}
+                    />
+                    <Route
+                        path="/monthly-report"
+                        element={<MonthlyReport />}
+                    />
+                    <Route
+                        path="/global-settings"
+                        element={<GlobalSettings />}
                     />
                 </Route>
             </Route>

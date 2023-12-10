@@ -75,7 +75,7 @@ export const Dashboard = () => {
                     name="Ryan Gomes"
                     sector="Administração"
                     registration="5233"
-                    scale="12 - 08h-12h/13h-17h"
+                    scale="1 - 08h-12h/13h-17h"
                     office="Matriz - Criciúma/SC"
                 />
                 <MonthSelector />

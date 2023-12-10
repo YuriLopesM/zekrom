@@ -24,17 +24,17 @@ export const Navbar = ({
         icon: CalendarIcon
     }, {
         title: 'Users',
-        path: '/users',
+        path: '/user-managment',
         roles: ['admin'],
         icon: UserIcon
     }, {
-        title: 'Relatório Mensal',
-        path: '/report',
+        title: 'Monthly Report',
+        path: '/monthly-report',
         roles: ['admin'],
         icon: FileTextIcon
     }, {
-        title: 'Settings',
-        path: '/settings',
+        title: 'Global Settings',
+        path: '/global-settings',
         roles: ['admin'],
         icon: SettingsIcon
     }]
