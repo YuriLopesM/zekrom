@@ -1,5 +1,5 @@
-import { useState } from 'react';
 import { Button } from '../UI';
+import { useFakeData } from '../../context/FakeDataContext';
 
 import {
     CalendarIcon,
@@ -8,8 +8,9 @@ import {
 } from '../Icons';
 import styles from './styles.module.scss';
 
+
 export const MonthSelector = () => {
-    const [date, setDate] = useState(new Date());
+    const { selectedDate: date, handleAddMonth, handleSubtractMonth } = useFakeData();
 
     const month =
         date.toLocaleString('pt-BR', {
@@ -32,14 +33,6 @@ export const MonthSelector = () => {
         day: 'numeric',
         month: 'numeric'
     });
-
-    const handleAddMonth = () => {
-        setDate(new Date(date.setMonth(date.getMonth() + 1)));
-    }
-
-    const handleSubtractMonth = () => {
-        setDate(new Date(date.setMonth(date.getMonth() - 1)));
-    }
 
     return (
         <div className={styles.container}>

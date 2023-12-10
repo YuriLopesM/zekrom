@@ -1,75 +1,12 @@
 
 
 import { DeleteIcon, EditIcon } from '../../components/Icons';
-import { useLocalStorage } from '../../hooks';
-
-import { v4 as uuidv4 } from 'uuid';
+import { useFakeData } from '../../context/FakeDataContext';
 
 import styles from './styles.module.scss';
 
-interface UserFormat {
-    id: string;
-    name: string;
-    registration: string;
-    schedule: string;
-    location: string;
-}
-
 export const UserManagment = () => {
-    const [users, setUsers] = useLocalStorage<UserFormat[]>('users-list:zekron', [
-        {
-            id: uuidv4(),
-            name: 'Yuri Lopes Machado',
-            registration: '000001',
-            schedule: '1 - 08h-12h/13h-17h',
-            location: 'Matriz - Criciúma/SC'
-        },
-        {
-            id: uuidv4(),
-            name: 'Vitor Minatto Barp',
-            registration: '000002',
-            schedule: '1 - 08h-12h/13h-17h',
-            location: 'Matriz - Criciúma/SC'
-        },
-        {
-            id: uuidv4(),
-            name: 'Danilo Formanski',
-            registration: '000003',
-            schedule: '1 - 08h-12h/13h-17h',
-            location: 'Matriz - Criciúma/SC'
-        },
-        {
-            id: uuidv4(),
-            name: 'João Victor Miotelli',
-            registration: '000004',
-            schedule: '1 - 08h-12h/13h-17h',
-            location: 'Matriz - Criciúma/SC'
-        },
-        {
-            id: uuidv4(),
-            name: 'Vinicius Albino',
-            registration: '000005',
-            schedule: '1 - 08h-12h/13h-17h',
-            location: 'Matriz - Criciúma/SC'
-        },
-        {
-            id: uuidv4(),
-            name: 'Lucas Alano',
-            registration: '000006',
-            schedule: '1 - 08h-12h/13h-17h',
-            location: 'Matriz - Criciúma/SC'
-        },
-    ]);
-
-    const handleDeleteUser = (id: string) => {
-        const hasConfirmed = confirm('Deseja realmente excluir este usuário?')
-
-        if (!hasConfirmed) return;
-
-        const newUsers = users.filter(user => user.id !== id);
-
-        setUsers(newUsers);
-    }
+    const { users, handleDeleteUser } = useFakeData();
 
     return (
         <div className={styles.page}>
@@ -85,8 +22,8 @@ export const UserManagment = () => {
                     </header>
                     <section>
                         {
-                            users.map((user, index) => (
-                                <div className={styles.item} key={index}>
+                            users.map((user) => (
+                                <div className={styles.item} key={user.id}>
                                     <p>{user.name}</p>
                                     <p>{user.registration}</p>
                                     <p>{user.schedule}</p>
