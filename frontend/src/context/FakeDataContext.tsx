@@ -6,11 +6,12 @@ interface FakeContextData {
   data: Data[];
   users: UserData[];
   monthlyData: MonthlyDataFormatted[];
+  absences: AbsenceDataFormatted[];
   selectedDate: Date;
-  globalSettings: any;
   handleAddMonth: () => void;
   handleSubtractMonth: () => void;
   handleDeleteUser: (id: string) => void;
+  handleChangeAbsenceApproval: ({date, isApproved}: { date: string, isApproved: boolean }) => void;
 }
 
 interface FakeDataProviderProps {
@@ -37,10 +38,14 @@ interface MonthlyDataFormatted extends Omit<MonthlyData, 'month'> {
   user: UserData;
 }
 
+interface AbsenceDataFormatted extends Absence {
+  user: UserData;
+}
+
 interface Absence {
   date: string;
-  reason: string;
-  isApproved: boolean;
+  justification: string;
+  isApproved?: boolean;
 }
 
 interface Data {
@@ -75,15 +80,23 @@ export const FakeDataProvider = ({ children }: FakeDataProviderProps) => {
       ],
       absences: [
         {
-          date: '05/09',
-          reason: 'Atestado Médico',
+          date: '05/12',
+          justification: 'Atestado Médico',
+        },
+        {
+          date: '04/12',
+          justification: 'Atestado Médico',
           isApproved: true
+        },
+        {
+          date: '01/12',
+          justification: 'Atestado Médico',
+          isApproved: false
         }
       ]
     }
   ]);
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [globalSettings, setGlobalSettings] = useLocalStorage<any>('global-settings:zekron', {});
 
   // Monthly Data
 
@@ -161,6 +174,16 @@ export const FakeDataProvider = ({ children }: FakeDataProviderProps) => {
     })
   })[0];
 
+  const absences: AbsenceDataFormatted[] = data.map(({ absences, user }) => {
+    return absences.map(item => {
+      const formattedItem = {
+        ...item,
+        user
+      }
+
+      return formattedItem;
+    })
+  })[0];
 
   // Date Controller
   const handleAddMonth = () => {
@@ -185,15 +208,48 @@ export const FakeDataProvider = ({ children }: FakeDataProviderProps) => {
     setData(newData);
   }
 
+  // Absences
+
+  const handleChangeAbsenceApproval = ({date, isApproved}: { date: string, isApproved: boolean }) => {
+    const newData = data.map(item => {
+      const absence = item.absences.find(absence => absence.date === date);
+
+      if (!absence) return item;
+
+      if (isApproved === absence.isApproved) {
+        const hasConfirmed = confirm('Deseja retirar a aprovação/desaprovação desta ausência?');	
+
+        if (!hasConfirmed) return item;
+        
+        absence.isApproved = undefined;
+        return item;
+      }
+
+      absence.isApproved = isApproved;
+
+      const hasConfirmed = confirm(`Deseja realmente ${isApproved ? 'aprovar' : 'desaprovar'} esta ausência?`);
+
+      if (!hasConfirmed) {
+        absence.isApproved = undefined;
+        return item;
+      }
+
+      return item;
+    })
+
+    setData(newData);
+  }
+
   return <FakeDataContext.Provider value={{
     data,
     users,
     monthlyData,
+    absences,
     selectedDate,
-    globalSettings,
     handleAddMonth,
     handleSubtractMonth,
-    handleDeleteUser
+    handleDeleteUser,
+    handleChangeAbsenceApproval
   }}>{children}</FakeDataContext.Provider>;
 };
 
