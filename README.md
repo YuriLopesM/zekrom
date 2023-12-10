@@ -11,6 +11,8 @@ College work - Timetrack clock for employees and managers ⏰
 ## Future Improvements
 
 - [ ] Study ways to do the publication of all modules
+- [ ] Improve the GitHub project, creating policies to branchs, necessary documents, etc.
+- [ ] Create Wiki
 
 **BACKEND**
 - [ ] Finish project and stop using mock in Frontend
