@@ -6,6 +6,8 @@ import { Button, Input, TabPane } from "../../components/UI";
 
 import { MonthlyData, UserData, WarningType } from "../../types";
 
+import NoContentImg from "../../assets/no-content.svg";
+
 import styles from './styles.module.scss';
 import { useFakeData } from "../../context/FakeDataContext";
 import { useAuth } from "../../context/AuthContext";
@@ -17,7 +19,7 @@ interface MonthlyDataFormatted extends Omit<MonthlyData, 'date'> {
 }
 
 export const Dashboard = () => {
-    const { user: userAuthenticated } = useAuth()
+    const { user: userAuthenticated} = useAuth()
     const {
         hourPoints,
         data,
@@ -31,6 +33,8 @@ export const Dashboard = () => {
 
     const [activeTab, setActiveTab] = useState('days');
     const [userMonthlyData, setUserMonthlyData] = useState<MonthlyDataFormatted>({} as MonthlyDataFormatted);
+
+    console.log('userMonthlyData', userMonthlyData)
 
     useEffect(() => {
         const monthlyData: MonthlyDataFormatted[] = data.map(({ monthlyData, user }) => {
@@ -61,40 +65,58 @@ export const Dashboard = () => {
     return (
         <div className={styles.page}>
             <section className={styles.header}>
-                <MyPunch
-                    name={userMonthlyData?.user?.name}
-                    sector={userMonthlyData?.user?.sector}
-                    registration={userMonthlyData?.user?.registration}
-                    schedule={userMonthlyData?.user?.schedule}
-                    location={userMonthlyData?.user?.location}
-                    imgUrl={userMonthlyData?.user?.imgUrl}
-                />
+                {
+                    userAuthenticated && (
+                        <MyPunch
+                            name={userAuthenticated?.name}
+                            sector={userAuthenticated?.sector}
+                            registration={userAuthenticated?.registration}
+                            schedule={userAuthenticated?.schedule}
+                            location={userAuthenticated?.location}
+                            imgUrl={userAuthenticated?.imgUrl}
+                        />
+                    )
+                }
                 <MonthSelector />
             </section>
             <main className={styles.content}>
-                <TabPane
-                    tabs={[
-                        {
-                            label: 'Esquema de Dias',
-                            tabKey: 'days'
-                        },
-                        {
-                            label: 'Pendentes',
-                            tabKey: 'pending'
-                        },
-                        {
-                            label: 'Totais',
-                            tabKey: 'total'
-                        }
-                    ]}
-                    activeTab={activeTab}
-                    handleTabChange={handleTabChange}
-                />
                 {
-                    activeTab === 'days' && (
+                    hourPoints.length > 0 && (
+                        <TabPane
+                            tabs={[
+                                {
+                                    label: 'Esquema de Dias',
+                                    tabKey: 'days'
+                                },
+                                {
+                                    label: 'Pendentes',
+                                    tabKey: 'pending'
+                                },
+                                {
+                                    label: 'Totais',
+                                    tabKey: 'total'
+                                }
+                            ]}
+                            activeTab={activeTab}
+                            handleTabChange={handleTabChange}
+                        />
+                    )
+                }
+
+                {
+                    activeTab === 'days' && hourPoints.length > 0 && (
                         <HourTable
                             data={hourPoints}
                         />
+                    )
+                }
+
+                {
+                    activeTab === 'days' && hourPoints.length === 0 && (
+                        <div className={styles.noContent}>
+                            <img src={NoContentImg} alt="No Content" />
+                            <h3>Nenhum registro encontrado.</h3>
+                        </div>
                     )
                 }
 
