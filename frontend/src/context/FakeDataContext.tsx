@@ -11,7 +11,7 @@ interface FakeContextData {
   handleAddMonth: () => void;
   handleSubtractMonth: () => void;
   handleDeleteUser: (id: string) => void;
-  handleChangeAbsenceApproval: ({date, isApproved}: { date: string, isApproved: boolean }) => void;
+  handleChangeAbsenceApproval: ({ date, isApproved }: { date: string, isApproved: boolean }) => void;
 }
 
 interface FakeDataProviderProps {
@@ -80,16 +80,16 @@ export const FakeDataProvider = ({ children }: FakeDataProviderProps) => {
       ],
       absences: [
         {
-          date: '05/12',
+          date: '05/12/2023',
           justification: 'Atestado Médico',
         },
         {
-          date: '04/12',
+          date: '04/12/2023',
           justification: 'Atestado Médico',
           isApproved: true
         },
         {
-          date: '01/12',
+          date: '01/12/2023',
           justification: 'Atestado Médico',
           isApproved: false
         }
@@ -157,9 +157,9 @@ export const FakeDataProvider = ({ children }: FakeDataProviderProps) => {
 
     setData(formattedData);
   }, [data])
-  
+
   const users = data.map(({ user }) => user);
-  
+
   const monthlyData: MonthlyDataFormatted[] = data.map(({ monthlyData, user }) => {
     return monthlyData.filter(({ month }) => {
       const selectedMonth = new Date(selectedDate).getMonth() + 1;
@@ -174,16 +174,26 @@ export const FakeDataProvider = ({ children }: FakeDataProviderProps) => {
     })
   })[0];
 
-  const absences: AbsenceDataFormatted[] = data.map(({ absences, user }) => {
-    return absences.map(item => {
-      const formattedItem = {
-        ...item,
-        user
-      }
+  const absences: AbsenceDataFormatted[] =
+    data
+      .map(({ absences, user }) => {
+        return absences.map(item => {
+          const formattedItem = {
+            ...item,
+            user
+          }
 
-      return formattedItem;
-    })
-  })[0];
+          return formattedItem;
+        })
+      })[0]
+      .filter(({ date }) => {
+        const selectedMonth = new Date(selectedDate).getMonth() + 1;
+        const selectedYear = new Date(selectedDate).getFullYear();
+
+        const [_, month, year] = date.split('/').map(item => Number(item));
+
+        return month === selectedMonth && year === selectedYear;
+      });
 
   // Date Controller
   const handleAddMonth = () => {
@@ -210,17 +220,17 @@ export const FakeDataProvider = ({ children }: FakeDataProviderProps) => {
 
   // Absences
 
-  const handleChangeAbsenceApproval = ({date, isApproved}: { date: string, isApproved: boolean }) => {
+  const handleChangeAbsenceApproval = ({ date, isApproved }: { date: string, isApproved: boolean }) => {
     const newData = data.map(item => {
       const absence = item.absences.find(absence => absence.date === date);
 
       if (!absence) return item;
 
       if (isApproved === absence.isApproved) {
-        const hasConfirmed = confirm('Deseja retirar a aprovação/desaprovação desta ausência?');	
+        const hasConfirmed = confirm('Deseja retirar a aprovação/desaprovação desta ausência?');
 
         if (!hasConfirmed) return item;
-        
+
         absence.isApproved = undefined;
         return item;
       }
