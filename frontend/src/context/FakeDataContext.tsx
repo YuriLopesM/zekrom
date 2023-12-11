@@ -30,14 +30,26 @@ export const FakeDataProvider = ({ children }: FakeDataProviderProps) => {
   const { userList } = useAuth();
 
   const initialDataState = userList.map((user) => {
+    const hourPoints = generateHourPoints(new Date())
+
     return {
       user,
-      hourPoints: generateHourPoints(new Date()),
+      hourPoints,
       monthlyData: [
         {
-          positiveCompTime: '00:00',
-          negativeCompTime: '08:00',
+          positiveCompTime: calculatePositiveHours(hourPoints, dayjs().toDate()),
+          negativeCompTime: calculateNegativeHours(hourPoints, dayjs().toDate()),
           date: dayjs().toDate(),
+        },
+        {
+          positiveCompTime: calculatePositiveHours(hourPoints, dayjs().toDate()),
+          negativeCompTime: calculateNegativeHours(hourPoints, dayjs().toDate()),
+          date: dayjs().subtract(1, 'month').toDate(),
+        },
+        {
+          positiveCompTime: calculatePositiveHours(hourPoints, dayjs().toDate()),
+          negativeCompTime: calculateNegativeHours(hourPoints, dayjs().toDate()),
+          date: dayjs().subtract(2, 'month').toDate(),
         }
       ],
     }
@@ -99,7 +111,7 @@ export const FakeDataProvider = ({ children }: FakeDataProviderProps) => {
     return formatBalance(balance);
   }
 
-  const formatBalance = (balance: number) => {
+  function formatBalance(balance: number) {
     if (balance === 0) return '00:00';
 
     const hours = Math.floor(balance / 60);
@@ -289,6 +301,14 @@ export const FakeDataProvider = ({ children }: FakeDataProviderProps) => {
     const hourPoint = {
       date,
       scaleId,
+      annotation: [] as string[],
+      situations: [
+        {
+          hour: '08:00',
+          description: 'Crédito BH',
+          status: 'wrong' as 'wrong' | 'normal' | undefined
+        }
+      ],
       warnings: [
         {
           description: 'Pendente',
@@ -303,6 +323,36 @@ export const FakeDataProvider = ({ children }: FakeDataProviderProps) => {
     }
 
     return [hourPoint, ...recursiveCreateHourPoint(newDate, scaleId)];
+  }
+
+  function calculateNegativeHours(hourPoints?: HourPoints[], date?: Date) {
+    if (!hourPoints) return '00:00';
+    if (!date) date = dayjs().toDate()
+
+    const negativeHours = hourPoints?.reduce((acc, curr) => {
+      if (curr.situations && curr.situations[0].status === 'wrong' && dayjs(curr.date).month() === dayjs(date).month() && dayjs(curr.date).year() === dayjs(date).year()) {
+        return acc + curr.situations[0].hour.split(':').reduce((acc, curr) => acc + Number(curr) * 60, 0);
+      }
+
+      return acc;
+    }, 0);
+
+    return formatBalance(negativeHours);
+  }
+
+  function calculatePositiveHours(hourPoints?: HourPoints[], date?: Date) {
+    if (!hourPoints) return '00:00';
+    if (!date) date = dayjs().toDate()
+
+    const positiveHours = hourPoints?.reduce((acc, curr) => {
+      if (curr.situations && curr.situations[0].status === 'normal' && dayjs(curr.date).month() === dayjs(date).month() && dayjs(curr.date).year() === dayjs(date).year()) {
+        return acc + curr.situations[0].hour.split(':').reduce((acc, curr) => acc + Number(curr) * 60, 0);
+      }
+
+      return acc;
+    }, 0);
+
+    return formatBalance(positiveHours);
   }
 
   return <FakeDataContext.Provider value={{

@@ -34,7 +34,7 @@ export const HourPoint = ({
                 <p>{scaleId}</p>
             </div>
             <div>
-                <HourNote text={annotation} />
+                <HourNote text={annotation?.join('-')} />
             </div>
             <div className={styles.situationContainer}>
                 {

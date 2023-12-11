@@ -32,7 +32,7 @@ export interface FakeData {
 export interface HourPoints {
     date: Date;
     scaleId: string;
-    annotation?: string;
+    annotation?: string[];
     situations?: ISituation[];
     warnings?: IWarning[];
 }

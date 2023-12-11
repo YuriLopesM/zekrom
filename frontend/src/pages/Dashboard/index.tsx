@@ -23,6 +23,8 @@ export const Dashboard = () => {
 
     useEffect(() => {
         const monthlyData: MonthlyDataFormatted[] = data.map(({ monthlyData, user }) => {
+            if (!monthlyData) return {} as MonthlyDataFormatted
+
             const filteredMonthlyData = filterBySelectedDate(monthlyData, selectedDate)
             return filteredMonthlyData.map(item => {
                 const formattedItem = {
@@ -35,11 +37,9 @@ export const Dashboard = () => {
         }).flat();
 
         const formattedUserMonthlyData = monthlyData.filter(({ user }) => {
-            return user.id === userAuthenticated?.id
+            return user?.id === userAuthenticated?.id
         })[0]
 
-        console.log(monthlyData)
-        console.log(formattedUserMonthlyData)
         setUserMonthlyData(formattedUserMonthlyData)
     }, [userAuthenticated])
 
