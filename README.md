@@ -15,7 +15,7 @@ College work - Timetrack clock for employees and managers ⏰
 - [ ] Create Wiki
 
 **BACKEND**
-- [ ] Finish project and stop using mock in Frontend
+- [ ] Finish project
   - [ ] Add ModelMapper
   - [ ] Auth
   - [ ] All Endpoints
@@ -26,6 +26,8 @@ College work - Timetrack clock for employees and managers ⏰
 - [ ] Fix some errors made in modeling, improve overall database
 
 **FRONTEND**
+- [ ] Stop using mock in Frontend and remove all Fake Data
+- [ ] Refactor hooks and everything that I created to behavior like an API
 - [ ] Use a loader to SVG Icons instead of creating a component for each SVG
 - [ ] Create a general Table Component, like the HourTable but for all use cases
 - [ ] Improve overall imports, use Path Aliases
@@ -33,6 +35,7 @@ College work - Timetrack clock for employees and managers ⏰
 - [ ] Refactor components using Primitive Components (like Radix, React Aria)
   - [ ] Decide: Use a UI Component lib x just refactoring to this componentization style
   - [ ] Add `classnames` lib to conditional styles
+  - [ ] Remove the `react-modal` component or improve its utilization
 
 **UI**
 - [ ] Improve prototype, add modals and dropdowns
