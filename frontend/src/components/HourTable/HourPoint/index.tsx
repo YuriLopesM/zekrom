@@ -6,6 +6,10 @@ import { WarningTag } from "../WarningTag";
 import { HourPoints } from "../../../types";
 
 import styles from "./styles.module.scss"
+import dayjs from "dayjs";
+import ptBR from "dayjs/locale/pt-br";
+
+dayjs.locale(ptBR);
 
 export const HourPoint = ({
     date,
@@ -14,14 +18,8 @@ export const HourPoint = ({
     situations,
     warnings
 }: HourPoints) => {
-    const formattedDate = date.toLocaleString('pt-BR', {
-        day: 'numeric',
-        month: 'numeric'
-    });
-
-    const dayOfWeek = date.toLocaleString('pt-BR', {
-        weekday: 'short'
-    });
+    const formattedDate = dayjs(date).format('DD/MM');
+    const dayOfWeek = dayjs(date).format('ddd');
 
     const handleActionsClick = () => {
         console.log('Clicou em ações');

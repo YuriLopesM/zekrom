@@ -1,80 +1,93 @@
 import { ReactNode, createContext, useContext, useEffect, useState } from "react";
 import { useLocalStorage } from "../hooks";
-import { v4 as uuidv4 } from 'uuid';
 import dayjs from 'dayjs';
 
-import { Absence, FakeData, HourPoints, MonthlyData, UserData } from "../types";
+import { FakeData, HourPoints, MonthlyData, UserData, WarningType } from "../types";
+import { useAuth } from "./AuthContext";
 
 interface FakeContextData {
   data: FakeData[];
   users: UserData[];
-  monthlyData: MonthlyDataFormatted[];
-  absences: AbsenceDataFormatted[];
+  hourPoints: HourPointsFormatted[];
   selectedDate: Date;
   handleAddMonth: () => void;
   handleSubtractMonth: () => void;
   handleDeleteUser: (id: string) => void;
-  handleChangeAbsenceApproval: ({ date, isApproved }: { date: string, isApproved: boolean }) => void;
+  handleChangeAbsenceApproval: ({ date, isApproved }: { date: Date, isApproved: boolean }) => void;
 }
 
 interface FakeDataProviderProps {
   children: ReactNode;
 }
 
-
-interface MonthlyDataFormatted extends Omit<MonthlyData, 'month'> {
+interface HourPointsFormatted extends HourPoints {
   user: UserData;
 }
-
-interface AbsenceDataFormatted extends Absence {
-  user: UserData;
-}
-
-
 
 export const FakeDataContext = createContext({} as FakeContextData);
 
 export const FakeDataProvider = ({ children }: FakeDataProviderProps) => {
-  const [data, setData] = useLocalStorage<FakeData[]>('data:zekron', [
-    {
-      user: {
-        id: uuidv4(),
-        name: 'Yuri Lopes Machado',
-        registration: '000001',
-        schedule: '1 - 08h-12h/13h-17h',
-        location: 'Matriz - Criciúma/SC'
-      },
+  const { userList } = useAuth();
+
+  const initialDataState = userList.map((user) => {
+    return {
+      user,
+      hourPoints: generateHourPoints(new Date()),
       monthlyData: [
         {
-          positiveCompTime: '08:00',
-          negativeCompTime: '00:00',
-          month: 11
-        },
-        {
-          positiveCompTime: '01:00',
-          negativeCompTime: '06:00',
-          month: 12
+          positiveCompTime: '00:00',
+          negativeCompTime: '08:00',
+          date: dayjs().toDate(),
         }
       ],
-      absences: [
-        {
-          date: '05/12/2023',
-          justification: 'Atestado Médico',
-        },
-        {
-          date: '04/12/2023',
-          justification: 'Atestado Médico',
-          isApproved: true
-        },
-        {
-          date: '01/12/2023',
-          justification: 'Atestado Médico',
-          isApproved: false
-        }
-      ]
     }
-  ]);
+  })
+
+  const [data, setData] = useLocalStorage<FakeData[]>('data:zekron', initialDataState)
   const [selectedDate, setSelectedDate] = useState(new Date());
+
+  useEffect(() => {
+    // setData([
+    //   {
+    //     user: {
+    //       id: userAuthenticated?.id || '09d1d186-ce25-4203-9464-5148b49a95bd',
+    //       name: userAuthenticated?.name || 'Yuri Lopes Machado',
+    //       registration: userAuthenticated?.registration || '000001',
+    //       sector: userAuthenticated?.sector || 'Administração',
+    //       schedule: userAuthenticated?.schedule || '1 - 08h-12h/13h-17h',
+    //       location: userAuthenticated?.location || 'Matriz - Criciúma/SC'
+    //     },
+    //     monthlyData: [
+    //       {
+    //         positiveCompTime: '08:00',
+    //         negativeCompTime: '00:00',
+    //         date: dayjs().subtract(1, 'month').toDate(),
+    //       },
+    //       {
+    //         positiveCompTime: '01:00',
+    //         negativeCompTime: '06:00',
+    //         date: dayjs().toDate(),
+    //       }
+    //     ],
+    //     absences: [
+    //       {
+    //         date: dayjs('05/12/2023').toDate(),
+    //         justification: 'Atestado Médico',
+    //       },
+    //       {
+    //         date: dayjs('04/12/2023').toDate(),
+    //         justification: 'Atestado Médico',
+    //         isApproved: true
+    //       },
+    //       {
+    //         date: dayjs('01/12/2023').toDate(),
+    //         justification: 'Atestado Médico',
+    //         isApproved: false
+    //       }
+    //     ]
+    //   }
+    // ])
+  }, [])
 
   // Monthly Data
 
@@ -100,7 +113,7 @@ export const FakeDataProvider = ({ children }: FakeDataProviderProps) => {
 
   const calculateTotalBalance = (monthlyData: MonthlyData[], targetMonth: number) => {
     const balance = monthlyData.reduce((acc, curr) => {
-      if (curr.month > targetMonth) return acc;
+      if (curr.date.getMonth() + 1 > targetMonth) return acc;
 
       const pos = curr.positiveCompTime.split(':').reduce((acc, curr) => acc + Number(curr) * 60, 0)
       const neg = curr.negativeCompTime.split(':').reduce((acc, curr) => acc + Number(curr) * 60, 0)
@@ -116,13 +129,13 @@ export const FakeDataProvider = ({ children }: FakeDataProviderProps) => {
     if (!data || !!data[0].monthlyData[0].monthBalance) return;
 
     const formattedData = data.map(({ monthlyData, ...rest }) => {
-      const formattedMonthlyData: MonthlyData[] = monthlyData?.map(({ positiveCompTime, negativeCompTime, month, ...rest }) => {
+      const formattedMonthlyData: MonthlyData[] = monthlyData?.map(({ positiveCompTime, negativeCompTime, date, ...rest }) => {
         return {
           positiveCompTime,
           negativeCompTime,
-          month,
+          date,
           monthBalance: calculateMonthBalance(positiveCompTime, negativeCompTime),
-          totalBalance: calculateTotalBalance(monthlyData, month),
+          totalBalance: calculateTotalBalance(monthlyData, date.getMonth() + 1),
           ...rest
         }
       })
@@ -136,13 +149,23 @@ export const FakeDataProvider = ({ children }: FakeDataProviderProps) => {
     setData(formattedData);
   }, [data])
 
+  const filterBySelectedDate: <T extends { date: Date }>(data: T[]) => T[] = (data) => {
+    return data.filter((item) => {
+      const date = dayjs(selectedDate).toDate();
+      const itemDate = dayjs(item.date).toDate();
+
+      return date.getMonth() === itemDate.getMonth() && date.getFullYear() === itemDate.getFullYear();
+    })
+  }
+
   const users = data.map(({ user }) => user);
 
-  const monthlyData: MonthlyDataFormatted[] = data.map(({ monthlyData, user }) => {
-    return monthlyData.filter(({ month }) => {
-      const selectedMonth = new Date(selectedDate).getMonth() + 1;
-      return month === selectedMonth;
-    }).map(item => {
+  const hourPoints: HourPointsFormatted[] = data.map(({ hourPoints, user }) => {
+    if (!hourPoints) return [];
+
+    const filteredHourPoints = filterBySelectedDate(hourPoints);
+
+    return filteredHourPoints.map(item => {
       const formattedItem = {
         ...item,
         user
@@ -151,27 +174,6 @@ export const FakeDataProvider = ({ children }: FakeDataProviderProps) => {
       return formattedItem;
     })
   })[0];
-
-  const absences: AbsenceDataFormatted[] =
-    data
-      .map(({ absences, user }) => {
-        return absences.map(item => {
-          const formattedItem = {
-            ...item,
-            user
-          }
-
-          return formattedItem;
-        })
-      })[0]
-      .filter(({ date }) => {
-        const selectedMonth = new Date(selectedDate).getMonth() + 1;
-        const selectedYear = new Date(selectedDate).getFullYear();
-
-        const [_, month, year] = date.split('/').map(item => Number(item));
-
-        return month === selectedMonth && year === selectedYear;
-      });
 
   // Date Controller
   const handleAddMonth = () => {
@@ -197,10 +199,9 @@ export const FakeDataProvider = ({ children }: FakeDataProviderProps) => {
   }
 
   // Absences
-
-  const handleChangeAbsenceApproval = ({ date, isApproved }: { date: string, isApproved: boolean }) => {
+  const handleChangeAbsenceApproval = ({ date, isApproved }: { date: Date, isApproved: boolean }) => {
     const newData = data.map(item => {
-      const absence = item.absences.find(absence => absence.date === date);
+      const absence = item.absences?.find(absence => absence.date === date);
 
       if (!absence) return item;
 
@@ -235,27 +236,33 @@ export const FakeDataProvider = ({ children }: FakeDataProviderProps) => {
     if (!newHours) return;
 
     const newData = data.map(item => {
-      const hasHourPoint = item.hourPoints && item.hourPoints.some(({ date }) => {
-        const selectedMonth = new Date(selectedDate).getMonth() + 1;
-        const selectedYear = new Date(selectedDate).getFullYear();
+      if (item.hourPoints) {
+        const hasHourPointOnSelectedMonth = item.hourPoints.find(hourPoint => {
+          const hourPointMonth = new Date(hourPoint.date).getMonth();
+          const selectedMonth = new Date(selectedDate).getMonth();
 
-        const [_, month, year] = date.toString().split('/').map(item => Number(item));
+          return hourPointMonth === selectedMonth;
+        });
 
-        return month === selectedMonth && year === selectedYear;
-      });
+        if (hasHourPointOnSelectedMonth) return item;
 
-      if (hasHourPoint) return item;
+
+        return {
+          ...item,
+          hourPoints: [...item.hourPoints, ...newHours]
+        }
+      };
 
       return {
         ...item,
-        hourPoints: newHours
+        hourPoints: newHours,
       }
     })
 
     setData(newData);
   }, [selectedDate])
 
-  const generateHourPoints = (selectedDate: Date) => {
+  function generateHourPoints(selectedDate: Date) {
     const today = dayjs().hour(0).minute(0).second(0).toDate();
     const lastDayOfMonth = dayjs(selectedDate).endOf('month').hour(0).minute(0).second(0).toDate();
 
@@ -276,13 +283,18 @@ export const FakeDataProvider = ({ children }: FakeDataProviderProps) => {
     }
   }
 
-  const recursiveCreateHourPoint = (date: Date, scaleId: string): HourPoints[] => {
+  function recursiveCreateHourPoint(date: Date, scaleId: string): HourPoints[] {
     const firstDayOfMonth = dayjs(date).startOf('month').toDate();
 
     const hourPoint = {
       date,
       scaleId,
-      warnings: []
+      warnings: [
+        {
+          description: 'Pendente',
+          type: WarningType.NEUTRAL
+        }
+      ]
     }
 
     const newDate = dayjs(date).subtract(1, 'day').hour(0).minute(0).second(0).toDate();
@@ -296,8 +308,7 @@ export const FakeDataProvider = ({ children }: FakeDataProviderProps) => {
   return <FakeDataContext.Provider value={{
     data,
     users,
-    monthlyData,
-    absences,
+    hourPoints,
     selectedDate,
     handleAddMonth,
     handleSubtractMonth,

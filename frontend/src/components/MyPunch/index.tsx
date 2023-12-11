@@ -1,27 +1,27 @@
 import styles from './styles.module.scss';
 
-import ProfilePic from '../../assets/profile-pic.jpeg';
-
 interface MyPunchProps {
     name: string;
     sector: string;
     registration: string;
-    scale: string;
-    office: string;
+    schedule: string;
+    location: string;
+    imgUrl: string;
 }
 
 export const MyPunch = ({
     name,
     sector,
     registration,
-    scale,
-    office
+    schedule,
+    location,
+    imgUrl
 }: MyPunchProps) => {
     return (
         <div className={styles.myPunch}>
             <h2>Meu Ponto</h2>
             <main>
-                <img src={ProfilePic} alt="Profile Picture" />
+                <img src={imgUrl} alt="Profile Picture" />
                 <section className={styles.info}>
                     <div>
                         <h3>{name}</h3>
@@ -33,11 +33,11 @@ export const MyPunch = ({
                     </div>
                     <div>
                         <h3>Escala</h3>
-                        <p>{scale}</p>
+                        <p>{schedule}</p>
                     </div>
                     <div>
                         <h3>Filial/Local</h3>
-                        <p>{office}</p>
+                        <p>{location}</p>
                     </div>
                 </section>
             </main>

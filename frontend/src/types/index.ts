@@ -4,10 +4,12 @@ export interface UserData {
     registration: string;
     schedule: string;
     location: string;
+    sector: string;
+    imgUrl: string;
 }
 
 export interface MonthlyData {
-    month: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
+    date: Date;
     positiveCompTime: string;
     negativeCompTime: string;
     totalBalance?: string;
@@ -15,7 +17,7 @@ export interface MonthlyData {
 }
 
 export interface Absence {
-    date: string;
+    date: Date;
     justification: string;
     isApproved?: boolean;
 }
@@ -23,7 +25,7 @@ export interface Absence {
 export interface FakeData {
     user: UserData;
     monthlyData: MonthlyData[];
-    absences: Absence[];
+    absences?: Absence[];
     hourPoints?: HourPoints[];
 }
 

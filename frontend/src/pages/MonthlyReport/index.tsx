@@ -3,13 +3,54 @@ import { useFakeData } from '../../context/FakeDataContext';
 
 import { MonthSelector } from '../../components';
 import { TabPane } from '../../components/UI';
+import { ThumbsDown, ThumbsUp } from '../../components/Icons';
+
+import dayjs from 'dayjs';
+
+import { Absence, MonthlyData, UserData } from '../../types';
+import { filterBySelectedDate } from '../../utils';
 
 import styles from './styles.module.scss';
-import { ThumbsDown, ThumbsUp } from '../../components/Icons';
+
+interface AbsenceDataFormatted extends Absence {
+    user: UserData;
+}
+
+interface MonthlyDataFormatted extends Omit<MonthlyData, 'date'> {
+    user: UserData;
+}
+
 
 export const MonthlyReport = () => {
     const [activeTab, setActiveTab] = useState('hours');
-    const { monthlyData, absences, handleChangeAbsenceApproval } = useFakeData();
+    const { data, selectedDate, handleChangeAbsenceApproval } = useFakeData();
+
+    const monthlyData: MonthlyDataFormatted[] = data.map(({ monthlyData, user }) => {
+        const filteredMonthlyData = filterBySelectedDate(monthlyData, selectedDate)
+        return filteredMonthlyData.map(item => {
+            const formattedItem = {
+                ...item,
+                user
+            }
+
+            return formattedItem;
+        })
+    })[0];
+
+    const absences: AbsenceDataFormatted[] =
+        data
+            .map(({ absences, user }) => {
+                if (!absences) return [];
+
+                return filterBySelectedDate(absences, selectedDate).map(item => {
+                    const formattedItem = {
+                        ...item,
+                        user
+                    }
+
+                    return formattedItem;
+                })
+            })[0]
 
     const handleTabChange = (tabKey: string) => {
         setActiveTab(tabKey);
@@ -108,17 +149,17 @@ export const MonthlyReport = () => {
                                     }) => (
                                         <div className={styles.item} key={user.id}>
                                             <p>{user.name}</p>
-                                            <p>{date}</p>
+                                            <p>{dayjs(date).format('DD/MM/YYYY')}</p>
                                             <p>{justification}</p>
                                             <div className={styles.approval}>
-                                                <ThumbsUp 
+                                                <ThumbsUp
                                                     className={`${isApproved ? styles.approved : null}`}
                                                     onClick={() => handleChangeAbsenceApproval({
                                                         date,
                                                         isApproved: true
                                                     })}
                                                 />
-                                                <ThumbsDown 
+                                                <ThumbsDown
                                                     className={`${isApproved === false ? styles.notApproved : null}`}
                                                     onClick={() => handleChangeAbsenceApproval({
                                                         date,
