@@ -1,9 +1,10 @@
-import { HourPoint, HourPointProps } from "./HourPoint"
+import { HourPoint } from "./HourPoint"
+import { HourPoints } from "../../types";
 
 import styles from "./styles.module.scss"
 
 interface HourTableProps {
-    data: HourPointProps[];
+    data: HourPoints[];
 }
 
 export const HourTable = ({

@@ -1,16 +1,5 @@
+import { IWarning, WarningType } from '../../../types';
 import styles from './styles.module.scss';
-
-export interface IWarning {
-    description: string;
-    type?: WarningType;
-}
-
-export enum WarningType {
-    POSITIVE = 'positive',
-    NEGATIVE = 'negative',
-    NEUTRAL = 'neutral',
-}
-
 
 export const WarningTag = ({
     description,

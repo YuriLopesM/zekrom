@@ -1,9 +1,12 @@
 import { ReactNode, createContext, useContext, useEffect, useState } from "react";
 import { useLocalStorage } from "../hooks";
 import { v4 as uuidv4 } from 'uuid';
+import dayjs from 'dayjs';
+
+import { Absence, FakeData, HourPoints, MonthlyData, UserData } from "../types";
 
 interface FakeContextData {
-  data: Data[];
+  data: FakeData[];
   users: UserData[];
   monthlyData: MonthlyDataFormatted[];
   absences: AbsenceDataFormatted[];
@@ -18,21 +21,6 @@ interface FakeDataProviderProps {
   children: ReactNode;
 }
 
-interface UserData {
-  id: string;
-  name: string;
-  registration: string;
-  schedule: string;
-  location: string;
-}
-
-interface MonthlyData {
-  month: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
-  positiveCompTime: string;
-  negativeCompTime: string;
-  totalBalance?: string;
-  monthBalance?: string;
-}
 
 interface MonthlyDataFormatted extends Omit<MonthlyData, 'month'> {
   user: UserData;
@@ -42,22 +30,12 @@ interface AbsenceDataFormatted extends Absence {
   user: UserData;
 }
 
-interface Absence {
-  date: string;
-  justification: string;
-  isApproved?: boolean;
-}
 
-interface Data {
-  user: UserData;
-  monthlyData: MonthlyData[];
-  absences: Absence[];
-}
 
 export const FakeDataContext = createContext({} as FakeContextData);
 
 export const FakeDataProvider = ({ children }: FakeDataProviderProps) => {
-  const [data, setData] = useLocalStorage<Data[]>('data:zekron', [
+  const [data, setData] = useLocalStorage<FakeData[]>('data:zekron', [
     {
       user: {
         id: uuidv4(),
@@ -248,6 +226,71 @@ export const FakeDataProvider = ({ children }: FakeDataProviderProps) => {
     })
 
     setData(newData);
+  }
+
+  // Hour Points
+  useEffect(() => {
+    const newHours = generateHourPoints(selectedDate);
+
+    if (!newHours) return;
+
+    const newData = data.map(item => {
+      const hasHourPoint = item.hourPoints && item.hourPoints.some(({ date }) => {
+        const selectedMonth = new Date(selectedDate).getMonth() + 1;
+        const selectedYear = new Date(selectedDate).getFullYear();
+
+        const [_, month, year] = date.toString().split('/').map(item => Number(item));
+
+        return month === selectedMonth && year === selectedYear;
+      });
+
+      if (hasHourPoint) return item;
+
+      return {
+        ...item,
+        hourPoints: newHours
+      }
+    })
+
+    setData(newData);
+  }, [selectedDate])
+
+  const generateHourPoints = (selectedDate: Date) => {
+    const today = dayjs().hour(0).minute(0).second(0).toDate();
+    const lastDayOfMonth = dayjs(selectedDate).endOf('month').hour(0).minute(0).second(0).toDate();
+
+    if (
+      selectedDate.getMonth() === today.getMonth() &&
+      selectedDate.getFullYear() === today.getFullYear()
+    ) {
+      const hourPoints = recursiveCreateHourPoint(today, '1');
+      return hourPoints;
+    }
+
+    if (
+      selectedDate.getMonth() < today.getMonth() &&
+      selectedDate.getFullYear() === today.getFullYear()
+    ) {
+      const hourPoints = recursiveCreateHourPoint(lastDayOfMonth, '1');
+      return hourPoints;
+    }
+  }
+
+  const recursiveCreateHourPoint = (date: Date, scaleId: string): HourPoints[] => {
+    const firstDayOfMonth = dayjs(date).startOf('month').toDate();
+
+    const hourPoint = {
+      date,
+      scaleId,
+      warnings: []
+    }
+
+    const newDate = dayjs(date).subtract(1, 'day').hour(0).minute(0).second(0).toDate();
+    if (newDate <= firstDayOfMonth) {
+      return [hourPoint]
+    }
+
+    return [hourPoint, ...recursiveCreateHourPoint(newDate, scaleId)];
   }
 
   return <FakeDataContext.Provider value={{

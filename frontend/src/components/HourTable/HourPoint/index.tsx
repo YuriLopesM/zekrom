@@ -1,17 +1,11 @@
 import { ActionsButton } from "../ActionsButton";
 import { HourNote } from "../HourNote";
-import { SituationText, ISituation } from "../SituationText";
-import { IWarning, WarningTag } from "../WarningTag";
+import { SituationText } from "../SituationText";
+import { WarningTag } from "../WarningTag";
+
+import { HourPoints } from "../../../types";
 
 import styles from "./styles.module.scss"
-
-export interface HourPointProps {
-    date: Date;
-    scaleId: string;
-    annotation?: string;
-    situations?: ISituation[];
-    warnings?: IWarning[];
-}
 
 export const HourPoint = ({
     date,
@@ -19,7 +13,7 @@ export const HourPoint = ({
     annotation,
     situations,
     warnings
-}: HourPointProps) => {
+}: HourPoints) => {
     const formattedDate = date.toLocaleString('pt-BR', {
         day: 'numeric',
         month: 'numeric'
@@ -42,13 +36,13 @@ export const HourPoint = ({
                 <p>{scaleId}</p>
             </div>
             <div>
-                <HourNote text={annotation} />	
+                <HourNote text={annotation} />
             </div>
             <div className={styles.situationContainer}>
                 {
                     situations?.map(situation => {
                         return (
-                            <SituationText 
+                            <SituationText
                                 hour={situation.hour}
                                 description={situation.description}
                                 status={situation.status}
@@ -61,11 +55,11 @@ export const HourPoint = ({
             <div>
                 {
                     warnings?.map(warning => {
-                        return <WarningTag 
-                                    type={warning.type} 
-                                    description={warning.description} 
-                                    key={warning.description}
-                                />
+                        return <WarningTag
+                            type={warning.type}
+                            description={warning.description}
+                            key={warning.description}
+                        />
                     })
                 }
             </div>

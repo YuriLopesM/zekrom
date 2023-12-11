@@ -3,8 +3,7 @@ import { useState } from "react";
 import { BigNumber, HourTable, MonthSelector, MyPunch } from "../../components"
 import { TabPane } from "../../components/UI";
 
-import { HourPointProps } from "../../components/HourTable/HourPoint";
-import { WarningType } from "../../components/HourTable/WarningTag";
+import { HourPoints, WarningType } from "../../types";
 
 import styles from './styles.module.scss';
 
@@ -15,10 +14,10 @@ export const Dashboard = () => {
         setActiveTab(tabKey);
     }
 
-    const hourPoints: HourPointProps[] = [
+    const hourPoints: HourPoints[] = [
         {
             date: new Date(),
-            scaleId: '12',
+            scaleId: '1',
             situations: [
                 {
                     hour: '08:00',
@@ -35,7 +34,7 @@ export const Dashboard = () => {
         },
         {
             date: new Date(),
-            scaleId: '12',
+            scaleId: '1',
             annotation: '08:00 12:00 13:00 18:20',
             situations: [
                 {
@@ -58,7 +57,7 @@ export const Dashboard = () => {
         },
         {
             date: new Date(),
-            scaleId: '12',
+            scaleId: '1',
             warnings: [
                 {
                     description: 'Expirado',

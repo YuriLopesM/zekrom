@@ -1,10 +1,6 @@
+import { ISituation } from '../../../types';
 import styles from './styles.module.scss';
 
-export interface ISituation {
-    description: string;
-    hour: string;
-    status?: 'normal' | 'wrong';
-}
 export const SituationText = ({
     hour,
     description,
