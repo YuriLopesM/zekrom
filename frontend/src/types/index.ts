@@ -16,6 +16,13 @@ export interface MonthlyData {
     monthBalance?: string;
 }
 
+export interface Annotation {
+    firstPunch: string;
+    secondPunch: string;
+    thirdPunch: string;
+    fourthPunch: string;
+}
+
 export interface Absence {
     date: Date;
     justification: string;
@@ -32,7 +39,7 @@ export interface FakeData {
 export interface HourPoints {
     date: Date;
     scaleId: string;
-    annotation?: string[];
+    annotation?: Annotation;
     situations?: ISituation[];
     warnings?: IWarning[];
 }

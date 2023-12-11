@@ -6,4 +6,12 @@
 .addHour {
     color: var(--aqua);
     text-decoration: underline;
+
+
+    cursor: pointer;
+}
+
+.expired {
+    color: var(--gray-400);
+    cursor: not-allowed
 }

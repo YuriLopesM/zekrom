@@ -2,7 +2,7 @@ import { ReactNode, createContext, useContext, useEffect, useState } from "react
 import { useLocalStorage } from "../hooks";
 import dayjs from 'dayjs';
 
-import { FakeData, HourPoints, MonthlyData, UserData, WarningType } from "../types";
+import { Annotation, FakeData, HourPoints, MonthlyData, UserData, WarningType } from "../types";
 import { useAuth } from "./AuthContext";
 
 interface FakeContextData {
@@ -10,10 +10,20 @@ interface FakeContextData {
   users: UserData[];
   hourPoints: HourPointsFormatted[];
   selectedDate: Date;
+  isModalOpen: boolean;
+  newAnnotation?: NewAnnotation;
   handleAddMonth: () => void;
   handleSubtractMonth: () => void;
   handleDeleteUser: (id: string) => void;
   handleChangeAbsenceApproval: ({ date, isApproved }: { date: Date, isApproved: boolean }) => void;
+  handleOpenAnnotationModal: (date: Date) => void;
+  handleCloseAnnotationModal: () => void;
+  handleAddPunchValue: (punch: string, value: string) => void;
+  handleAddNewAnnotation: () => void;
+}
+
+interface NewAnnotation extends Annotation {
+  date: Date;
 }
 
 interface FakeDataProviderProps {
@@ -27,7 +37,7 @@ interface HourPointsFormatted extends HourPoints {
 export const FakeDataContext = createContext({} as FakeContextData);
 
 export const FakeDataProvider = ({ children }: FakeDataProviderProps) => {
-  const { userList } = useAuth();
+  const { userList, user: userAuthenticated } = useAuth();
 
   const initialDataState = userList.map((user) => {
     const hourPoints = generateHourPoints(new Date())
@@ -40,16 +50,6 @@ export const FakeDataProvider = ({ children }: FakeDataProviderProps) => {
           positiveCompTime: calculatePositiveHours(hourPoints, dayjs().toDate()),
           negativeCompTime: calculateNegativeHours(hourPoints, dayjs().toDate()),
           date: dayjs().toDate(),
-        },
-        {
-          positiveCompTime: calculatePositiveHours(hourPoints, dayjs().toDate()),
-          negativeCompTime: calculateNegativeHours(hourPoints, dayjs().toDate()),
-          date: dayjs().subtract(1, 'month').toDate(),
-        },
-        {
-          positiveCompTime: calculatePositiveHours(hourPoints, dayjs().toDate()),
-          negativeCompTime: calculateNegativeHours(hourPoints, dayjs().toDate()),
-          date: dayjs().subtract(2, 'month').toDate(),
         }
       ],
     }
@@ -57,6 +57,137 @@ export const FakeDataProvider = ({ children }: FakeDataProviderProps) => {
 
   const [data, setData] = useLocalStorage<FakeData[]>('data:zekron', initialDataState)
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [isModalOpen, setModalOpen] = useState(false);
+
+  const [newAnnotation, setNewAnnotation] = useState<NewAnnotation>({} as NewAnnotation);
+
+  const handleOpenAnnotationModal = (date: Date) => {
+    setModalOpen(true);
+    setNewAnnotation({
+      date,
+      firstPunch: '',
+      secondPunch: '',
+      thirdPunch: '',
+      fourthPunch: '',
+    })
+  }
+
+  const handleCloseAnnotationModal = () => {
+    setModalOpen(false);
+    setNewAnnotation({} as NewAnnotation)
+  }
+
+  const handleAddPunchValue = (punch: string, value: string) => {
+    setNewAnnotation(prev => ({
+      ...prev as Annotation,
+      date: prev.date,
+      [punch]: value
+    }))
+  }
+
+  const handleAddNewAnnotation = () => {
+    if (!newAnnotation) return;
+
+    const annotation: Annotation = {
+      firstPunch: newAnnotation.firstPunch,
+      secondPunch: newAnnotation.secondPunch,
+      thirdPunch: newAnnotation.thirdPunch,
+      fourthPunch: newAnnotation.fourthPunch,
+    }
+
+    if (Object.values(annotation).some(note => note === '')) return alert('Preencha todos os campos!')
+
+    const newData = data.map(item => {
+      if (item.user.id !== userAuthenticated?.id) return item;
+
+      const newHourPoints = item.hourPoints?.map(hourPoint => {
+        if (dayjs(hourPoint.date).isSame(dayjs(newAnnotation.date), 'day')) {
+          const firstInterval = calculateDiffTime(newAnnotation.firstPunch, newAnnotation.secondPunch)
+          const secondInterval = calculateDiffTime(newAnnotation.thirdPunch, newAnnotation.fourthPunch)
+          const hoursWorking = firstInterval + secondInterval;
+
+          const EIGHT_HOURS_IN_MINUTES = 480;
+
+          if (hoursWorking > EIGHT_HOURS_IN_MINUTES) {
+            return {
+              ...hourPoint,
+              annotation,
+              situations: [
+                {
+                  hour: formatBalance(EIGHT_HOURS_IN_MINUTES),
+                  description: 'Trabalhando',
+                  status: 'normal' as 'wrong' | 'normal' | undefined
+                },
+                {
+                  hour: formatBalance(hoursWorking - EIGHT_HOURS_IN_MINUTES),
+                  description: 'Crédito BH',
+                  status: 'normal' as 'wrong' | 'normal' | undefined
+                }
+              ],
+              warnings: [
+                {
+                  description: 'Enviado',
+                  type: WarningType.POSITIVE
+                }
+              ]
+            }
+          }
+
+          return {
+            ...hourPoint,
+            annotation,
+            situations: [
+              {
+                hour: formatBalance(hoursWorking),
+                description: 'Trabalhando',
+                status: 'normal' as 'normal' | 'wrong' | undefined
+              }
+            ],
+            warnings: [
+              {
+                description: 'Enviado',
+                type: WarningType.POSITIVE
+              }
+            ]
+          }
+        }
+
+        return hourPoint;
+      })
+      return {
+        ...item,
+        hourPoints: newHourPoints,
+        monthlyData: item.monthlyData?.map(monthlyData => {
+          if (dayjs(monthlyData.date).isSame(dayjs(newAnnotation.date), 'month')) {
+            const positiveCompTime = calculatePositiveHours(newHourPoints, monthlyData.date);
+            const negativeCompTime = calculateNegativeHours(newHourPoints, monthlyData.date);
+            const monthBalance = calculateMonthBalance(positiveCompTime, negativeCompTime);
+
+            const totalBalance =
+              dayjs(monthlyData.date).isSame(dayjs(new Date()), 'month')
+                ? monthBalance
+                : monthlyData.totalBalance
+                  ? formatBalance(transformTimeTextToMinutes(monthBalance) + transformTimeTextToMinutes(monthlyData.totalBalance))
+                  : monthBalance;
+
+            return {
+              ...monthlyData,
+              positiveCompTime,
+              negativeCompTime,
+              monthBalance,
+              totalBalance
+            }
+          }
+
+          return monthlyData;
+        })
+      }
+    })
+
+    setData(newData);
+    alert('Anotação inserida com sucesso!');
+    handleCloseAnnotationModal();
+  }
 
   useEffect(() => {
     // setData([
@@ -104,8 +235,8 @@ export const FakeDataProvider = ({ children }: FakeDataProviderProps) => {
   // Monthly Data
 
   const calculateMonthBalance = (positiveCompTime: string, negativeCompTime: string) => {
-    const pos = positiveCompTime.split(':').reduce((acc, curr) => acc + Number(curr) * 60, 0)
-    const neg = negativeCompTime.split(':').reduce((acc, curr) => acc + Number(curr) * 60, 0)
+    const pos = transformTimeTextToMinutes(positiveCompTime)
+    const neg = transformTimeTextToMinutes(negativeCompTime)
 
     const balance = pos - neg;
     return formatBalance(balance);
@@ -138,7 +269,7 @@ export const FakeDataProvider = ({ children }: FakeDataProviderProps) => {
 
   // Formatted Data
   useEffect(() => {
-    if (!data || !!data[0].monthlyData[0].monthBalance) return;
+    if (!data || !!data[0].monthlyData[0].totalBalance) return;
 
     const formattedData = data.map(({ monthlyData, ...rest }) => {
       const formattedMonthlyData: MonthlyData[] = monthlyData?.map(({ positiveCompTime, negativeCompTime, date, ...rest }) => {
@@ -278,6 +409,8 @@ export const FakeDataProvider = ({ children }: FakeDataProviderProps) => {
     const today = dayjs().hour(0).minute(0).second(0).toDate();
     const lastDayOfMonth = dayjs(selectedDate).endOf('month').hour(0).minute(0).second(0).toDate();
 
+    if (dayjs(selectedDate).isBefore(today, 'month')) return;
+
     if (
       selectedDate.getMonth() === today.getMonth() &&
       selectedDate.getFullYear() === today.getFullYear()
@@ -298,21 +431,22 @@ export const FakeDataProvider = ({ children }: FakeDataProviderProps) => {
   function recursiveCreateHourPoint(date: Date, scaleId: string): HourPoints[] {
     const firstDayOfMonth = dayjs(date).startOf('month').toDate();
 
+    const isNotExpired = dayjs(date).diff(new Date(), 'day') > -7
     const hourPoint = {
       date,
       scaleId,
-      annotation: [] as string[],
+      annotation: {} as Annotation,
       situations: [
         {
           hour: '08:00',
-          description: 'Crédito BH',
+          description: 'Débito BH',
           status: 'wrong' as 'wrong' | 'normal' | undefined
         }
       ],
       warnings: [
         {
-          description: 'Pendente',
-          type: WarningType.NEUTRAL
+          description: isNotExpired ? 'Pendente' : 'Bloqueado',
+          type: isNotExpired ? WarningType.NEUTRAL : WarningType.NEGATIVE
         }
       ]
     }
@@ -329,30 +463,45 @@ export const FakeDataProvider = ({ children }: FakeDataProviderProps) => {
     if (!hourPoints) return '00:00';
     if (!date) date = dayjs().toDate()
 
-    const negativeHours = hourPoints?.reduce((acc, curr) => {
-      if (curr.situations && curr.situations[0].status === 'wrong' && dayjs(curr.date).month() === dayjs(date).month() && dayjs(curr.date).year() === dayjs(date).year()) {
-        return acc + curr.situations[0].hour.split(':').reduce((acc, curr) => acc + Number(curr) * 60, 0);
+    const debitHours = hourPoints.map(hourPoint => hourPoint.situations?.filter(situation => situation.description === 'Débito BH')).flat().reduce((acc, curr) => {
+      if (curr) {
+        return acc + transformTimeTextToMinutes(curr.hour);
       }
 
       return acc;
     }, 0);
 
-    return formatBalance(negativeHours);
+    return formatBalance(debitHours);
   }
 
   function calculatePositiveHours(hourPoints?: HourPoints[], date?: Date) {
     if (!hourPoints) return '00:00';
     if (!date) date = dayjs().toDate()
 
-    const positiveHours = hourPoints?.reduce((acc, curr) => {
-      if (curr.situations && curr.situations[0].status === 'normal' && dayjs(curr.date).month() === dayjs(date).month() && dayjs(curr.date).year() === dayjs(date).year()) {
-        return acc + curr.situations[0].hour.split(':').reduce((acc, curr) => acc + Number(curr) * 60, 0);
+    const creditHours = hourPoints.map(hourPoint => hourPoint.situations?.filter(situation => situation.description === 'Crédito BH')).flat().reduce((acc, curr) => {
+      if (curr) {
+        return acc + transformTimeTextToMinutes(curr.hour);
       }
 
       return acc;
     }, 0);
 
-    return formatBalance(positiveHours);
+    return formatBalance(creditHours);
+  }
+
+  function calculateDiffTime(fromTime: string, toTime: string) {
+    const [hoursFromTime, minutesFromTime] = fromTime.split(':');
+    const [hoursToTime, minutesToTime] = toTime.split(':');
+
+    const diffTime = dayjs().hour(+hoursToTime).minute(+minutesToTime).diff(dayjs().hour(+hoursFromTime).minute(+minutesFromTime), 'minute');
+
+    return diffTime;
+  }
+
+  function transformTimeTextToMinutes(time: string) {
+    const [hours, minutes] = time.split(':');
+
+    return Number(hours) * 60 + Number(minutes);
   }
 
   return <FakeDataContext.Provider value={{
@@ -360,10 +509,16 @@ export const FakeDataProvider = ({ children }: FakeDataProviderProps) => {
     users,
     hourPoints,
     selectedDate,
+    isModalOpen,
+    newAnnotation,
     handleAddMonth,
     handleSubtractMonth,
     handleDeleteUser,
-    handleChangeAbsenceApproval
+    handleChangeAbsenceApproval,
+    handleOpenAnnotationModal,
+    handleCloseAnnotationModal,
+    handleAddPunchValue,
+    handleAddNewAnnotation
   }}>{children}</FakeDataContext.Provider>;
 };
 
